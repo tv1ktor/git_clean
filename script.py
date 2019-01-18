@@ -12,14 +12,19 @@ def init_safe_branch_clean(branches):
 	
 	bar.start()
 	
+	items_finished = 0
 	for branch in branches:
 		deleted_branch = subprocess.Popen(['git', 'branch', '-d', branch], stdout=PIPE, stderr=PIPE, text=True)
 		stdoutput, stderroutput = deleted_branch.communicate()
-		bar.update(i+1)
+		items_finished =+ 1
+		bar.update(items_finished)
 		sleep(0.1)
 		if stderroutput:
-			remaining_branches.push(deleted_branch)
+			remaining_branches.insert(-1, deleted_branch)
 			continue
 
 	bar.finish()
+
+	items_failed = len(remaining_branches)
+	print(' Total cleaned: {}\n Active branches remaining: {}'.format(items_finished-items_failed, items_failed))
 	exit()
