@@ -1,0 +1,7 @@
+#1 Check for user customizations of git branch output
+#2 Put exception for current branch
+#3 Allow force delete on unmerged branches (+exceptions)
+https://stackoverflow.com/questions/10610327/delete-all-local-git-branches
+
+git fetch --prune
+https://medium.com/@FlorentDestrema/a-simple-way-to-clean-up-your-git-project-branches-283b87478fbc
