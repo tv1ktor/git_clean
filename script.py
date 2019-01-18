@@ -20,11 +20,11 @@ def init_safe_branch_clean(branches):
 		bar.update(items_finished)
 		sleep(0.1)
 		if stderroutput:
-			remaining_branches.insert(-1, deleted_branch)
+			remaining_branches.append(deleted_branch)
 			continue
 
 	bar.finish()
 
 	items_failed = len(remaining_branches)
-	print(' Total cleaned: {}\n Active branches remaining: {}'.format(items_finished-items_failed, items_failed))
+	print(' Total cleaned: {}\n Active branches remaining: {}'.format(items_finished-items_failed, items_failed+1))
 	exit()
