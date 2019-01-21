@@ -12,7 +12,6 @@ def init_safe_branch_clean(branches):
 			text=True
 		)
 		stdoutput, stderroutput = deleted_branch.communicate()
-		finished += 1
 		if stderroutput:
 			failed_branches.append(deleted_branch)
 			continue

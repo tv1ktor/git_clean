@@ -27,7 +27,7 @@ def print_found_branches(branch_list, branch_current):
 			print("\033[92m" + branch, "(safe)\033[0m")
 		else:
 			print(branch)
-	print(const.SEARCH_RESULT_MESSAGE.format(len(branches)))
+	print(const.SEARCH_RESULT_MESSAGE.format(len(branch_list)))
 
 
 def begin_program_looping(branch_list, branch_current):
@@ -37,7 +37,8 @@ def begin_program_looping(branch_list, branch_current):
 		if cmd == 'y':
 			from script import init_safe_branch_clean
 			branch_list.remove('master')
-			branch_list.remove(branch_current)
+			if 'master' != branch_current:
+				branch_list.remove(branch_current)
 			return init_safe_branch_clean(branch_list)
 		elif cmd == 'n':
 			raise KeyboardInterrupt
@@ -49,6 +50,7 @@ def main():
 	branches = re.split(r"\s+|\n|[\s\*]", branch_output)
 	branches = list(filter(None, branches))
 	current_br = status_output.split('\n')[0].split(' ')[2]
+	print(current_br)
 	print_found_branches(branches, current_br)
 	try:
 		begin_program_looping(branches, current_br)
@@ -58,7 +60,7 @@ def main():
 	# Check for additional commands here later
 
 
-if __name__ == __main__:
+if __name__ == "__main__":
 	main()
 
 
