@@ -2,39 +2,64 @@
 from sys import exit
 import subprocess
 import re 
+import constants as const
 
 # Fetch and display all branches
 PIPE = subprocess.PIPE
-git_query = subprocess.Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, text=True)
-output, output_error = git_query.communicate()
 
-if output:
-	branches = re.split(r"\s+|\n|[\s\*]", output)
-	branches = list(filter(None, branches))
-	for branch in branches:
-		if branch == 'master':
+git_status = subprocess.Popen(['git', 'status'], stdout=PIPE, stderr=PIPE, text=True)
+status_output, status_error = git_status.communicate()
+
+git_branch = subprocess.Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE, text=True)
+branch_output, branch_error = git_branch.communicate()
+
+if status_error:
+	print(const.GIT_STATUS_ERROR.format(status_error))
+	exit()
+elif branch_error:
+	print(const.GIT_BRANCH_ERROR.format(output_error))
+	exit()
+
+
+def print_found_branches(branch_list, branch_current):
+	for branch in branch_list:
+		if branch in ('master', branch_current):
 			print("\033[92m" + branch, "(safe)\033[0m")
 		else:
 			print(branch)
-	print("<< Found {} branches:".format(len(branches)))
-else:
-	print("<< Subprocess error: {}".format(output_error))
-	exit()
+	print(const.SEARCH_RESULT_MESSAGE.format(len(branches)))
 
-# Receive command and call cleaner function
-try:
+
+def begin_program_looping(branch_list, branch_current):
 	while True:
-		cmd = input('\n>> Delete all fully merged branches [y/n]: ')
+		print(const.BEGIN_CLEAN_PROMPT)
+		cmd = input()
 		if cmd == 'y':
 			from script import init_safe_branch_clean
-			branches.remove('master')
-			init_safe_branch_clean(branches)
+			branch_list.remove('master')
+			branch_list.remove(branch_current)
+			return init_safe_branch_clean(branch_list)
 		elif cmd == 'n':
 			raise KeyboardInterrupt
 		else: 
-			print("<< Wrong command")
+			print(const.WRONG_CMD_MESSAGE)
 
-except KeyboardInterrupt as error:
-	print('<< Exiting the program...')
-	exit()
+
+def main():
+	branches = re.split(r"\s+|\n|[\s\*]", branch_output)
+	branches = list(filter(None, branches))
+	current_br = status_output.split('\n')[0].split(' ')[2]
+	print_found_branches(branches, current_br)
+	try:
+		begin_program_looping(branches, current_br)
+	except KeyboardInterrupt as error:
+		print(const.EXIT_MESSAGE)
+		exit()
+	# Check for additional commands here later
+
+
+if __name__ == __main__:
+	main()
+
+
 	
